@@ -1,0 +1,168 @@
+basePath: /v1/
+definitions:
+  handlers.catCreateRequest:
+    properties:
+      age:
+        type: integer
+      name:
+        type: string
+      vaccinated:
+        type: boolean
+    required:
+    - age
+    - name
+    type: object
+  handlers.catUpdateRequest:
+    properties:
+      age:
+        type: integer
+      id:
+        type: string
+      name:
+        type: string
+      vaccinated:
+        type: boolean
+    required:
+    - age
+    - name
+    type: object
+  model.Cat:
+    properties:
+      age:
+        type: integer
+      id:
+        type: string
+      name:
+        type: string
+      vaccinated:
+        type: boolean
+    type: object
+host: localhost:9090
+info:
+  contact: {}
+  description: API server for shelters cats
+  title: Cats API
+  version: "1.0"
+paths:
+  /cat/:
+    post:
+      consumes:
+      - application/json
+      description: create cat
+      operationId: create-cat
+      parameters:
+      - description: Cat info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.catCreateRequest'
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Create cat
+      tags:
+      - cat
+  /cat/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: delete cat
+      operationId: delete-cat
+      parameters:
+      - description: Cat ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Delete cat by ID
+      tags:
+      - cat
+    get:
+      consumes:
+      - application/json
+      description: get cat
+      operationId: get-cat
+      parameters:
+      - description: Cat ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Cat'
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get returns cat by ID
+      tags:
+      - cat
+    put:
+      consumes:
+      - application/json
+      description: update cat
+      operationId: update-cat
+      parameters:
+      - description: Cat ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Cat info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.catUpdateRequest'
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: integer
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Update cat by ID
+      tags:
+      - cat
+schemes:
+- http
+swagger: "2.0"

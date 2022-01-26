@@ -1,0 +1,252 @@
+{
+    "schemes": [
+        "http"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "API server for shelters cats",
+        "title": "Cats API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:9090",
+    "basePath": "/v1/",
+    "paths": {
+        "/cat/": {
+            "post": {
+                "description": "create cat",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "cat"
+                ],
+                "summary": "Create cat",
+                "operationId": "create-cat",
+                "parameters": [
+                    {
+                        "description": "Cat info",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.catCreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/cat/{id}": {
+            "get": {
+                "description": "get cat",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "cat"
+                ],
+                "summary": "Get returns cat by ID",
+                "operationId": "get-cat",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Cat ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Cat"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "update cat",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "cat"
+                ],
+                "summary": "Update cat by ID",
+                "operationId": "update-cat",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Cat ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Cat info",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.catUpdateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "delete cat",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "cat"
+                ],
+                "summary": "Delete cat by ID",
+                "operationId": "delete-cat",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Cat ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "handlers.catCreateRequest": {
+            "type": "object",
+            "required": [
+                "age",
+                "name"
+            ],
+            "properties": {
+                "age": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "vaccinated": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "handlers.catUpdateRequest": {
+            "type": "object",
+            "required": [
+                "age",
+                "name"
+            ],
+            "properties": {
+                "age": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "vaccinated": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "model.Cat": {
+            "type": "object",
+            "properties": {
+                "age": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "vaccinated": {
+                    "type": "boolean"
+                }
+            }
+        }
+    }
+}

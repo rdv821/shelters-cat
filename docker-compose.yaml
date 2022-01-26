@@ -1,0 +1,50 @@
+version: "3"
+
+services:
+  cat-app:
+    build: ./
+    command: ./cat-app
+    ports:
+      - "9090:9090"
+    depends_on:
+      - postgres-db
+      - mongo-db
+      - redis
+    environment:
+      - SERVER_ADDRESS=:9090
+      - MONGO_URL=mongodb://mongo-db:27017
+      - POSTGRES_URL=postgres://postgres:qwerty@postgres-db:5432/catsdb?sslmode=disable&pool_max_conns=100
+      - REDIS_URL=redis:6379
+      - DB_TYPE=postgres
+
+  postgres-db:
+    image: postgres:14.1-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: qwerty
+      POSTGRES_DB: catsdb
+    volumes:
+      - ./postgres-volume:/var/lib/postgresql/data
+
+  mongo-db:
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./mongo-volume:/data/db
+
+  flyway:
+    image: flyway/flyway
+    command:
+      -url="jdbc:postgresql://postgres-db:5432/catsdb" -user=postgres -password=qwerty -locations=filesystem:/migrations migrate
+    volumes:
+      - ./migrations:/migrations
+    depends_on:
+      - postgres-db
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
