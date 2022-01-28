@@ -3,6 +3,7 @@ package repository
 
 import (
 	"context"
+
 	"github.com/catService/internal/model"
 	"github.com/go-redis/redis/v8"
 	"github.com/google/uuid"
@@ -19,6 +20,7 @@ type SheltersCatRepository interface {
 	Delete(context.Context, uuid.UUID) error
 }
 
+// RedisRepository interface
 type RedisRepository interface {
 	Get(context.Context, uuid.UUID) (*model.Cat, error)
 	Create(context.Context, *model.Cat) error
@@ -35,6 +37,7 @@ func NewMongoRepository(database *mongo.Database) SheltersCatRepository {
 	return NewCatMongo(database)
 }
 
-func NewRedisRepository(client *redis.Client) RedisRepository {
-	return NewCatRedis(client)
+// NewLocalCache constructor
+func NewLocalCache(ctx context.Context, client *redis.Client) *CatRedisCache {
+	return NewRedisCache(ctx, client)
 }

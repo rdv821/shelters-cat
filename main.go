@@ -2,7 +2,8 @@ package main
 
 import (
 	"context"
-	"github.com/go-redis/redis/v8"
+	"errors"
+	"net/http"
 	"os"
 	"os/signal"
 	"time"
@@ -14,6 +15,7 @@ import (
 	"github.com/catService/internal/service"
 	"github.com/catService/internal/validator"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
@@ -31,7 +33,8 @@ import (
 // @schemes   http
 
 func main() {
-	const timeout = 5 * time.Second
+	const timeout = 20 * time.Second
+	ctx, _ := signal.NotifyContext(context.Background(), os.Interrupt)
 
 	// config
 	cfg, err := config.New()
@@ -41,14 +44,16 @@ func main() {
 
 	var rps repository.SheltersCatRepository
 	client := NewRedis(cfg.RedisURL)
-	redisRepository := repository.NewRedisRepository(client)
-	if cfg.DBType == "postgres" {
+	redisRepository := repository.NewLocalCache(ctx, client)
+
+	switch cfg.DBType {
+	case "postgres":
 		db := NewPostgresDB(cfg.PostgresURL)
 		rps = repository.NewPostgresRepository(db)
-	} else if cfg.DBType == "mongo" {
+	case "mongo":
 		db := NewMongoDB(cfg.MongoURL)
 		rps = repository.NewMongoRepository(db)
-	} else {
+	default:
 		logrus.Fatalf("Unknown db type %v", cfg.DBType)
 	}
 
@@ -68,17 +73,17 @@ func main() {
 
 	go func() {
 		err = e.Start(cfg.ServerPort)
-		if err != nil {
-			logrus.Fatalf("Can't start server: %v", err)
+		if errors.Is(err, http.ErrServerClosed) {
+			logrus.Infof("Server stopped: %v", err)
+		} else {
+			logrus.Fatalf("Can't start server %v", err)
 		}
 	}()
 
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, os.Interrupt)
-	<-quit
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	<-ctx.Done()
+	ctxWithTimeout, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
-	if err := e.Shutdown(ctx); err != nil {
+	if err := e.Shutdown(ctxWithTimeout); err != nil {
 		logrus.Fatalf("Can't shutdown server gracefully: %v", err)
 	}
 }
@@ -117,7 +122,6 @@ func NewMongoDB(dbURL string) *mongo.Database {
 
 // NewRedis create connection
 func NewRedis(redisURL string) *redis.Client {
-
 	client := redis.NewClient(&redis.Options{
 		Addr:     redisURL,
 		Password: "",

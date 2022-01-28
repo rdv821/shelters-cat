@@ -25,7 +25,6 @@ func TestCatHandler_Get(t *testing.T) {
 		Vaccinated: true,
 	}
 
-	//catRepository := &mocks.SheltersCatRepository{}
 	service := &servicemock.SheltersCatService{}
 	catHandler := NewCat(service)
 
@@ -45,7 +44,6 @@ func TestCatHandler_Get(t *testing.T) {
 }
 
 func TestCatHandler_Create(t *testing.T) {
-
 	input := &model.Cat{
 		ID:         uuid.MustParse("00000000-0000-0000-0000-000000000000"),
 		Name:       "Cat 21",
@@ -53,7 +51,6 @@ func TestCatHandler_Create(t *testing.T) {
 		Vaccinated: true,
 	}
 
-	//catRepository := &mocks.SheltersCatRepository{}
 	service := &servicemock.SheltersCatService{}
 	catHandler := NewCat(service)
 	service.On("Create", context.Background(), input).Return(nil)
