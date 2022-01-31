@@ -85,8 +85,8 @@ func (c *CatRedisCache) handleAction(action string, value interface{}) error {
 			return errors.New("key not found")
 		}
 		delete(c.cats, k)
-
 	}
+
 	return nil
 }
 
